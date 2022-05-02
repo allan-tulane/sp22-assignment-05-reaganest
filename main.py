@@ -35,21 +35,29 @@ def fast_MED(S, T, MED={}):
     return MED[key]
     
 def fast_align_MED(S, T, MED={}):
-    key = S,T
+  key = S,T
+  if not S and not T:
+    return 0
   if not S:
     MED[0,len(T)] = len(T)
-    return MED[0,len(T)]
+    return MED[0,len(T)] *'-',T
   elif not T:
     MED[len(S),0] = len(S)
-    return MED[len(S),0]
+    return S,MED[len(S),0] * '-'
   elif key in MED:
-    return MED[key]
+      return MED[(key)]
   elif (S[0] == T[0]):
-    return(fast_MED(S[1:], T[1:]))
+    MED[(key)] = [S[0]+ fast_align_MED(S[1:],T[1:]),T[0] +fast_align_MED(S[1:],T[1:]), MED[(S[1:],T[1:])][2]]
   else:
-    MED[key] = (1 + min(fast_MED(S, T[1:]), fast_MED(S[1:],T), fast_MED(S[1:],T[1:])))
-    return MED[key]
-
+    compare = min(MED[(S, T[1:])][2], MED[(S[1:],T)][2], MED[(S[1:],T[1:])][2])
+    if compare == MED[(S[1:],T)][2] and MED[(S[1:],T)][2] != MED[(S[1:],T[1:])][2] :
+      MED[(key)] = [S[0]+ fast_align_MED(S[1:],T), '-' + fast_align_MED(S[1:],T), compare]
+    elif compare == MED[(S,T[1:])][2] and MED[(S,T[1:])][2] != MED[(S[1:],T[1:])][2]:
+      MED[(key)] = ['-'+ fast_align_MED(S,T[1:]), T[0] + fast_align_MED(S,T[1:]), compare]
+    else:
+       MED[(key)] = [S[0]+ fast_align_MED(S[1:],T[1:]), T[0] + fast_align_MED(S[1:],T[1:]), compare]
+  return MED[(key)]
+  
 def test_MED():
     for S, T in test_cases:
         assert fast_MED(S, T) == MED(S, T)
